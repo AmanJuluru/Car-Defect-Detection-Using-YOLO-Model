@@ -1,0 +1,15 @@
+# Automobile Defect Detection Portal - Dependencies
+# ==================================================
+# Python version: 3.8+
+
+# Web Framework
+Flask>=2.3.0
+
+# Machine Learning - YOLO Object Detection
+ultralytics>=8.0.0
+
+# Image Processing
+opencv-python>=4.8.0
+
+# Security (included with Flask, but listed for clarity)
+Werkzeug>=2.3.0
