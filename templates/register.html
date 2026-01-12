@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card animate-slide-up">
+        <div class="auth-header">
+            <div class="auth-logo">AD</div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join the manufacturing inspection team</p>
+        </div>
+
+        <div class="auth-body">
+            <form method="POST" action="{{ url_for('register') }}" id="registerForm">
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-input"
+                        placeholder="Choose a username (min. 3 characters)" minlength="3" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-input"
+                        placeholder="Create a password (min. 4 characters)" minlength="4" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-input"
+                        placeholder="Re-enter your password" minlength="4" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg">✨ Create Account</button>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div class="page-header">
+        <h1 class="page-title">👤 My Profile</h1>
+        <p class="page-subtitle">Manage your account settings and view your inspection statistics</p>
+    </div>
+
+    <div class="profile-grid">
+        <!-- User Info Card -->
+        <div class="card profile-card">
+            <div class="card-header">
+                <h3 class="card-title">👤 Account Information</h3>
+            </div>
+            <div class="card-body">
+                <div class="profile-avatar">
+                    <div class="avatar-circle">{{ username[0]|upper }}</div>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-info-item">
+                        <span class="profile-label">Username</span>
+                        <span class="profile-value">{{ username }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Role</span>
+                        <span class="profile-value">Quality Inspector</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Member Since</span>
+                        <span class="profile-value">{{ user['created_at'][:10] if user['created_at'] else 'N/A'
+                            }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Account ID</span>
+                        <span class="profile-value">#{{ user['id'] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">📊 Inspection Statistics</h3>
+            </div>
+            <div class="card-body">
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">{{ total_inspections }}</div>
+                        <div class="profile-stat-label">Total Inspections</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value text-danger">{{ broken_count }}</div>
+                        <div class="profile-stat-label">Defects Found</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value text-success">{{ non_broken_count }}</div>
+                        <div class="profile-stat-label">Passed</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value text-primary">
+                            {% if total_inspections > 0 %}
+                            {{ ((non_broken_count / total_inspections) * 100)|round|int }}%
+                            {% else %}
+                            0%
+                            {% endif %}
+                        </div>
+                        <div class="profile-stat-label">Pass Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🔐 Change Password</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('profile') }}">
+                    <div class="form-group">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input type="password" id="current_password" name="current_password" class="form-input"
+                            placeholder="Enter current password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" id="new_password" name="new_password" class="form-input"
+                            placeholder="Enter new password (min. 4 characters)" minlength="4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-input"
+                            placeholder="Confirm new password" minlength="4" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">🔄 Update Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

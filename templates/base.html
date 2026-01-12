@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Automobile Defect Detection Portal - Manufacturing Quality Inspection System">
+    <title>{% block title %}AutoDefect Pro{% endblock %} | Manufacturing Quality Portal</title>
+
+    <!-- Google Fonts - Inter for professional typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    {% if session.get('user_id') %}
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="nav-brand-icon">AD</div>
+            <div>
+                <div class="nav-brand-text">AutoDefect Pro</div>
+                <div class="nav-brand-subtitle">Quality Inspection Portal</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}"
+                class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <span>📊</span> Dashboard
+            </a>
+            <a href="{{ url_for('upload') }}" class="nav-link {% if request.endpoint == 'upload' %}active{% endif %}">
+                <span>📤</span> Upload
+            </a>
+            <a href="{{ url_for('history') }}" class="nav-link {% if request.endpoint == 'history' %}active{% endif %}">
+                <span>📜</span> History
+            </a>
+            <a href="{{ url_for('profile') }}" class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}">
+                <span>👤</span> Profile
+            </a>
+            <a href="{{ url_for('logout') }}" class="nav-link nav-link-logout">
+                <span>🚪</span> Logout
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="main-container">
+        <div class="alert-container">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {% if category == 'success' %}✓{% elif category == 'error' %}✕{% elif category == 'info' %}ℹ{% else
+                %}⚠{% endif %}
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Page Scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

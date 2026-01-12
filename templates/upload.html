@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Upload Image{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div class="page-header">
+        <h1 class="page-title">📤 Upload Vehicle Image</h1>
+        <p class="page-subtitle">Upload a vehicle image to detect exterior defects using AI-powered analysis</p>
+    </div>
+
+    <!-- Upload Form Card -->
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                <!-- Clickable Upload Zone -->
+                <div class="upload-zone" id="dropZone" onclick="document.getElementById('imageInput').click()">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-title">Click to select or drag & drop</div>
+                    <div class="upload-subtitle">Supports JPG, JPEG, PNG formats</div>
+                </div>
+
+                <!-- Hidden file input -->
+                <input type="file" name="image" id="imageInput" accept=".jpg,.jpeg,.png"
+                    style="position: absolute; left: -9999px; opacity: 0;" required>
+
+                <!-- File Preview Section -->
+                <div id="filePreview" class="file-preview" style="display: none;">
+                    <div class="file-preview-content">
+                        <span class="file-preview-icon">📄</span>
+                        <div class="file-preview-info">
+                            <span class="file-preview-name" id="fileName"></span>
+                            <span class="file-preview-size" id="fileSize"></span>
+                        </div>
+                        <button type="button" class="file-preview-remove" onclick="removeFile()">✕</button>
+                    </div>
+                </div>
+
+                <!-- Image Preview -->
+                <div id="imagePreview" class="image-preview-container" style="display: none;">
+                    <img id="previewImage" class="image-preview" alt="Preview">
+                </div>
+
+                <div class="upload-actions">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                        🔍 Analyze for Defects
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Detection Results -->
+    {% if result_data %}
+    <div class="result-container animate-slide-up">
+        <div class="result-header">
+            <h2 class="section-title">🔎 Detection Results</h2>
+            <span
+                class="status-badge status-badge-lg {% if result_data.vehicle_status == 'Broken' %}broken{% else %}non-broken{% endif %}">
+                {% if result_data.vehicle_status == 'Broken' %}⚠️{% else %}✓{% endif %}
+                {{ result_data.vehicle_status }}
+            </span>
+        </div>
+
+        <div class="result-grid">
+            <div class="result-image-container">
+                <img src="{{ result_data.result_image }}" class="result-image" alt="Detection Result">
+            </div>
+
+            <div class="result-sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 Summary</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Status:</strong> {{ result_data.vehicle_status }}</p>
+                        <p><strong>Defects Found:</strong> {{ result_data.detection_count }}</p>
+                    </div>
+                </div>
+
+                {% if result_data.detections %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🏷️ Detected Defects</h3>
+                    </div>
+                    <ul class="detection-list">
+                        {% for det in result_data.detections %}
+                        <li class="detection-item">
+                            <span class="detection-class">{{ det.class }}</span>
+                            <span class="detection-confidence">{{ det.confidence }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <a href="{{ url_for('upload') }}" class="btn btn-secondary btn-block">
+                    📤 Upload Another Image
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block scripts %}
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('imageInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = document.getElementById('previewImage');
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Show file info and preview
+    function showFileInfo(file) {
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        filePreview.style.display = 'block';
+        dropZone.classList.add('has-file');
+
+        // Show image preview
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            previewImage.src = e.target.result;
+            imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Remove selected file
+    function removeFile() {
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        imagePreview.style.display = 'none';
+        dropZone.classList.remove('has-file');
+    }
+
+    // File input change handler
+    fileInput.addEventListener('change', function () {
+        if (this.files.length > 0) {
+            showFileInfo(this.files[0]);
+        }
+    });
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+
+    // Highlight on drag over
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, function () {
+            this.classList.add('dragover');
+        });
+    });
+
+    // Remove highlight on drag leave/drop
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, function () {
+            this.classList.remove('dragover');
+        });
+    });
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', function (e) {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            // Create a new DataTransfer to set files
+            const dt = new DataTransfer();
+            dt.items.add(files[0]);
+            fileInput.files = dt.files;
+            showFileInfo(files[0]);
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

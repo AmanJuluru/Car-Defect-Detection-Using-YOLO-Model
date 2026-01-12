@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Detection History{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div class="page-header">
+        <h1 class="page-title">📜 Inspection History</h1>
+        <p class="page-subtitle">View all your past vehicle defect inspections and results</p>
+    </div>
+
+    {% if records %}
+    <div class="history-grid">
+        {% for record in records %}
+        <div class="history-card">
+            <img src="{{ url_for('static', filename='results/' + record['result_image']) }}" class="history-card-image"
+                alt="Inspection {{ record['id'] }}">
+
+            <div class="history-card-body">
+                <div class="history-card-header">
+                    <span
+                        class="status-badge {% if record['vehicle_status'] == 'Broken' %}broken{% else %}non-broken{% endif %}">
+                        {% if record['vehicle_status'] == 'Broken' %}⚠️{% else %}✓{% endif %}
+                        {{ record['vehicle_status'] }}
+                    </span>
+                    <span class="history-card-timestamp">{{ record['timestamp'][:16] }}</span>
+                </div>
+
+                <dl class="history-card-details">
+                    <dt>Defects Detected</dt>
+                    <dd>{{ record['detection_count'] }} defect(s)</dd>
+
+                    <dt>Defect Classes</dt>
+                    <dd>{{ record['defect_classes'] or 'None detected' }}</dd>
+
+                    <dt>Confidence Scores</dt>
+                    <dd>{{ record['confidence_scores'] or 'N/A' }}</dd>
+                </dl>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3 class="empty-state-title">No Inspection History</h3>
+            <p>You haven't performed any vehicle inspections yet.</p>
+            <a href="{{ url_for('upload') }}" class="btn btn-primary mt-lg">📤 Start First Inspection</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

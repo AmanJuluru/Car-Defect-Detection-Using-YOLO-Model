@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner animate-fade-in">
+        <div class="welcome-content">
+            <h1 class="welcome-title">Welcome back, {{ username }}! 👋</h1>
+            <p class="welcome-subtitle">
+                Quality Inspection Dashboard • Manufacturing Unit Portal
+            </p>
+            <div class="welcome-actions">
+                <a href="{{ url_for('upload') }}" class="welcome-btn">📤 New Inspection</a>
+                <a href="{{ url_for('history') }}" class="welcome-btn">📜 View History</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card animate-slide-up">
+            <div class="stat-card-icon primary">📊</div>
+            <div class="stat-card-value">{{ total_inspections }}</div>
+            <div class="stat-card-label">Total Inspections</div>
+        </div>
+
+        <div class="stat-card animate-slide-up">
+            <div class="stat-card-icon danger">🔴</div>
+            <div class="stat-card-value">{{ broken_count }}</div>
+            <div class="stat-card-label">Defects Detected</div>
+        </div>
+
+        <div class="stat-card animate-slide-up">
+            <div class="stat-card-icon success">✅</div>
+            <div class="stat-card-value">{{ non_broken_count }}</div>
+            <div class="stat-card-label">Passed Inspections</div>
+        </div>
+
+        <div class="stat-card animate-slide-up">
+            <div class="stat-card-icon warning">📈</div>
+            <div class="stat-card-value">
+                {% if total_inspections > 0 %}
+                {{ ((non_broken_count / total_inspections) * 100)|round|int }}%
+                {% else %}
+                0%
+                {% endif %}
+            </div>
+            <div class="stat-card-label">Pass Rate</div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="section-header">
+        <h2 class="section-title">📋 Recent Inspections</h2>
+        <a href="{{ url_for('history') }}" class="btn btn-secondary">View All</a>
+    </div>
+
+    <div class="card">
+        {% if recent_inspections %}
+        <table class="activity-table">
+            <thead>
+                <tr>
+                    <th>Preview</th>
+                    <th>Status</th>
+                    <th>Defects</th>
+                    <th>Confidence</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in recent_inspections %}
+                <tr>
+                    <td>
+                        <img src="{{ url_for('static', filename='results/' + record['result_image']) }}"
+                            class="activity-thumbnail" alt="Inspection">
+                    </td>
+                    <td>
+                        <span
+                            class="status-badge {% if record['vehicle_status'] == 'Broken' %}broken{% else %}non-broken{% endif %}">
+                            {% if record['vehicle_status'] == 'Broken' %}⚠️{% else %}✓{% endif %}
+                            {{ record['vehicle_status'] }}
+                        </span>
+                    </td>
+                    <td>{{ record['defect_classes'] or 'None' }}</td>
+                    <td>{{ record['confidence_scores'] or 'N/A' }}</td>
+                    <td class="text-muted">{{ record['timestamp'][:16] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3 class="empty-state-title">No Inspections Yet</h3>
+            <p>Start by uploading your first vehicle image for defect detection.</p>
+            <a href="{{ url_for('upload') }}" class="btn btn-primary mt-lg">📤 Upload Image</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
