@@ -80,7 +80,7 @@ cd Car-Defect-Detection-Using-YOLO-Model
 ### Step 2: Install Dependencies
 
 ```bash
-pip install flask ultralytics opencv-python werkzeug
+pip install -r requirements.txt
 ```
 
 ### Step 3: Verify Model File
@@ -173,6 +173,7 @@ When defects are detected, the system:
 ```
 project/
 ├── app.py                      # Main Flask application
+├── requirements.txt            # Python dependencies
 ├── database.db                 # SQLite database (auto-generated)
 ├── model/
 │   └── defect_model.pt         # Pre-trained YOLO model
@@ -229,11 +230,12 @@ project/
 - **Storage**: 2 GB free disk space
 
 ### Software Dependencies
+See [requirements.txt](requirements.txt) for the complete list of dependencies:
 ```
-flask>=2.0.0
+Flask>=2.3.0
 ultralytics>=8.0.0
-opencv-python>=4.0.0
-werkzeug>=2.0.0
+opencv-python>=4.8.0
+Werkzeug>=2.3.0
 ```
 
 ---
